@@ -1,0 +1,222 @@
+# =============================================================================
+# FLUTTER / DART - Core Generated Files
+# =============================================================================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+**/doc/api/
+
+# Flutter generated files that may contain local paths
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# =============================================================================
+# ANDROID - Build & Config (contains local SDK paths / usernames)
+# =============================================================================
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
+/android/key.properties
+/android/*.keystore
+/android/*.jks
+/android/app/*.keystore
+/android/app/*.jks
+
+# Gradle wrapper (regenerated on build)
+/android/gradle/wrapper/gradle-wrapper.jar
+/android/gradlew
+/android/gradlew.bat
+
+# =============================================================================
+# iOS / macOS - Build & Config
+# =============================================================================
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/App.framework/
+**/ios/Flutter/Flutter.framework/
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/ServiceDefinitions.json
+**/ios/DerivedData/
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/xcuserdata/
+**/ios/**/.generated/
+
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/Flutter/ephemeral/
+
+# Podfile.lock - regenerated per machine
+**/Podfile.lock
+
+# =============================================================================
+# WINDOWS / LINUX - Build artifacts
+# =============================================================================
+/windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugin_registrant.h
+/windows/flutter/generated_plugins.cmake
+/linux/flutter/generated_plugin_registrant.cc
+/linux/flutter/generated_plugin_registrant.h
+/linux/flutter/generated_plugins.cmake
+
+# =============================================================================
+# IDE & EDITOR FILES (may contain local settings / paths)
+# =============================================================================
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# Other editors
+.atom/
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# OS GENERATED FILES
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# BUILD OUTPUTS & BINARIES
+# =============================================================================
+*.apk
+*.aab
+*.ipa
+*.app
+*.exe
+*.dll
+*.so
+*.dylib
+
+# =============================================================================
+# LOGS & TEMP FILES
+# =============================================================================
+*.log
+*.tmp
+*.temp
+*.cache
+.buildlog/
+.history/
+
+# =============================================================================
+# CODE GENERATION
+# =============================================================================
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# =============================================================================
+# VERSION CONTROL & MISC
+# =============================================================================
+.svn/
+.hg/
+.git/
+migrate_working_dir/
+
+# Python (if any scripts)
+*.pyc
+*.pyo
+__pycache__/
+*.class
+
+# =============================================================================
+# SECRETS & SENSITIVE DATA
+# =============================================================================
+*.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.p12
+*.key
+google-services.json
+GoogleService-Info.plist
+
+# =============================================================================
+# KEYSTORE & SIGNING (CRITICAL - NEVER COMMIT)
+# =============================================================================
+# Android keystore files
+*.keystore
+*.jks
+key.properties
+keystore/
+release.keystore
+debug.keystore
+
+# Keystore generation outputs
+**/keystore/release.jks
+**/keystore/debug.jks
+ecotrail-release.jks
+ecotrail-debug.jks
+
+# Base64 encoded keystore exports (if accidentally saved)
+*.keystore.b64
+*.jks.b64
+keystore-base64.txt
+
+# =============================================================================
+# CI/CD GENERATED FILES
+# =============================================================================
+# GitHub Actions artifacts (local)
+artifacts/
+*.artifact
+
+# Build signing artifacts
+signing/
+app-signing/
+
+# Documentation
+documentation/
+
+# =============================================================================
+# FVM (Flutter Version Management)
+# =============================================================================
+.fvm/
+fvm_config.json
+
+# =============================================================================
+# COVERAGE & TESTING
+# =============================================================================
+coverage/
+.test_coverage/
+*.lcov
+

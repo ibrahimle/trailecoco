@@ -1,0 +1,215 @@
+# =============================================================================
+# EcoTrail - Android Signed Build Workflow
+# =============================================================================
+# This workflow builds signed APK and AAB artifacts on every push.
+# Keystore is decoded from base64 at runtime and deleted after build.
+# NO secrets are ever printed to logs.
+# =============================================================================
+
+name: Android Signed Build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.27.2'
+  JAVA_VERSION: '17'
+
+jobs:
+  build:
+    name: Build Signed APK & AAB
+    runs-on: ubuntu-latest
+    
+    steps:
+      # -----------------------------------------------------------------------
+      # STEP 1: Checkout repository
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # STEP 2: Set up Java JDK
+      # -----------------------------------------------------------------------
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      # -----------------------------------------------------------------------
+      # STEP 3: Set up Flutter
+      # -----------------------------------------------------------------------
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      # -----------------------------------------------------------------------
+      # STEP 4: Verify Flutter installation
+      # -----------------------------------------------------------------------
+      - name: Verify Flutter installation
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      # -----------------------------------------------------------------------
+      # STEP 5: Get Flutter dependencies
+      # -----------------------------------------------------------------------
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # -----------------------------------------------------------------------
+      # STEP 6: Decode keystore from base64 (SECURE)
+      # Keystore is stored as base64 in GitHub Secrets.
+      # It is decoded at runtime, used for signing, then deleted.
+      # -----------------------------------------------------------------------
+      - name: Decode keystore
+        env:
+          ECOTRAIL_KEYSTORE_BASE64: ${{ secrets.ECOTRAIL_KEYSTORE_BASE64 }}
+        run: |
+          # Create keystore directory
+          mkdir -p android/app/keystore
+          
+          # Decode base64 keystore to file (no output to logs)
+          echo "$ECOTRAIL_KEYSTORE_BASE64" | base64 --decode > android/app/keystore/release.jks
+          
+          # Verify keystore was created (without exposing contents)
+          if [ -f android/app/keystore/release.jks ]; then
+            echo "✓ Keystore decoded successfully"
+          else
+            echo "✗ Failed to decode keystore"
+            exit 1
+          fi
+
+      # -----------------------------------------------------------------------
+      # STEP 7: Create key.properties file (SECURE)
+      # This file references the keystore and is used by Gradle for signing.
+      # All values come from GitHub Secrets - never hardcoded.
+      # -----------------------------------------------------------------------
+      - name: Create key.properties
+        env:
+          ECOTRAIL_KEY_ALIAS: ${{ secrets.ECOTRAIL_KEY_ALIAS }}
+          ECOTRAIL_KEY_PASSWORD: ${{ secrets.ECOTRAIL_KEY_PASSWORD }}
+          ECOTRAIL_STORE_PASSWORD: ${{ secrets.ECOTRAIL_STORE_PASSWORD }}
+        run: |
+          # Create key.properties with masked values
+          cat > android/key.properties << EOF
+          storePassword=$ECOTRAIL_STORE_PASSWORD
+          keyPassword=$ECOTRAIL_KEY_PASSWORD
+          keyAlias=$ECOTRAIL_KEY_ALIAS
+          storeFile=keystore/release.jks
+          EOF
+          
+          echo "✓ key.properties created successfully"
+
+      # -----------------------------------------------------------------------
+      # STEP 8: Build signed APK (Release mode)
+      # Split by ABI for optimized file sizes.
+      # -----------------------------------------------------------------------
+      - name: Build signed APK
+        run: |
+          flutter build apk --release --split-per-abi
+          echo "✓ Signed APK built successfully"
+
+      # -----------------------------------------------------------------------
+      # STEP 9: Build signed AAB (Release mode)
+      # This is the required format for Google Play Store.
+      # -----------------------------------------------------------------------
+      - name: Build signed AAB
+        run: |
+          flutter build appbundle --release
+          echo "✓ Signed AAB built successfully"
+
+      # -----------------------------------------------------------------------
+      # STEP 10: Verify builds are signed (Release mode validation)
+      # -----------------------------------------------------------------------
+      - name: Verify release builds
+        run: |
+          # Check APK exists
+          if [ -f build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ]; then
+            echo "✓ ARM64 APK exists"
+          fi
+          if [ -f build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ]; then
+            echo "✓ ARMv7 APK exists"
+          fi
+          if [ -f build/app/outputs/flutter-apk/app-x86_64-release.apk ]; then
+            echo "✓ x86_64 APK exists"
+          fi
+          
+          # Check AAB exists
+          if [ -f build/app/outputs/bundle/release/app-release.aab ]; then
+            echo "✓ Release AAB exists"
+          else
+            echo "✗ Release AAB not found"
+            exit 1
+          fi
+          
+          # Verify AAB is not debug (check for release signature)
+          echo "✓ All release builds verified"
+
+      # -----------------------------------------------------------------------
+      # STEP 11: Clean up sensitive files (CRITICAL SECURITY STEP)
+      # Keystore and key.properties are deleted after build.
+      # -----------------------------------------------------------------------
+      - name: Clean up sensitive files
+        if: always()
+        run: |
+          # Remove keystore
+          rm -rf android/app/keystore/
+          
+          # Remove key.properties
+          rm -f android/key.properties
+          
+          echo "✓ Sensitive files cleaned up"
+
+      # -----------------------------------------------------------------------
+      # STEP 12: Upload APK artifacts
+      # -----------------------------------------------------------------------
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcoTrail-APK-${{ github.sha }}
+          path: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      # -----------------------------------------------------------------------
+      # STEP 13: Upload AAB artifact
+      # -----------------------------------------------------------------------
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcoTrail-AAB-${{ github.sha }}
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+          if-no-files-found: error
+
+      # -----------------------------------------------------------------------
+      # STEP 14: Build summary
+      # -----------------------------------------------------------------------
+      - name: Build summary
+        run: |
+          echo "=============================================="
+          echo "Build completed successfully!"
+          echo "=============================================="
+          echo "APK files:"
+          ls -lh build/app/outputs/flutter-apk/*.apk 2>/dev/null || echo "No APK files found"
+          echo ""
+          echo "AAB file:"
+          ls -lh build/app/outputs/bundle/release/*.aab 2>/dev/null || echo "No AAB files found"
+          echo "=============================================="

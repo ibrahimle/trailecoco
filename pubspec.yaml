@@ -1,0 +1,41 @@
+name: eco_trail
+description: EcoTrail - A Flame game engine powered adventure.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+  flutter: ^3.38.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.34.0
+  flame_audio: ^2.11.12
+  shared_preferences: ^2.5.4
+  hive_ce: ^2.16.0
+  google_fonts: ^7.0.2
+  provider: ^6.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/ui/icon_app.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/audio/
+    - assets/fonts/
+    - assets/images/backgrounds/
+    - assets/images/characters/
+    - assets/images/items/
+    - assets/images/ui/
+
